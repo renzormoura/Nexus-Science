@@ -1300,3 +1300,46 @@ html { scroll-behavior: auto; }
 .jr-rail i { height: 100%; transform: scaleY(var(--prog, 0)); transform-origin: top; will-change: transform; }
 .jr-card { box-shadow: 0 30px 60px -44px var(--accent); }
 .jr-hero, .jr-net { contain: paint; }
+
+/* ---- Relatorio: resumo executivo, tabela comparativa e diagrama de selecao ---- */
+.exec-nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+.exec-num { display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.exec-num strong { font-size: 1.35rem; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.exec-num span { font-size: 0.8rem; color: var(--muted); }
+.exec-alerts li { color: var(--text); }
+.compare-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+.compare-table th, .compare-table td { text-align: left; vertical-align: top; padding: 9px 10px; border-bottom: 1px solid var(--border); }
+.compare-table th { font-size: 0.72rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.compare-table th:first-child, .compare-table td:first-child { width: 34px; padding-right: 0; }
+.compare-table td.cell-main { min-width: 220px; }
+.compare-table td { overflow-wrap: break-word; }
+.prisma { margin: 0; display: grid; gap: 0; max-width: 640px; }
+.prisma figcaption { font-weight: 600; margin-bottom: 12px; }
+.prisma-row { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); align-items: center; gap: 0; }
+.prisma-box { display: grid; gap: 3px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.prisma-box.is-final { border: 2px solid var(--accent); }
+.prisma-box small { font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.prisma-box strong { font-size: 0.95rem; }
+.prisma-box b { font-size: 1.35rem; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.prisma-note { font-size: 0.8rem; color: var(--muted); }
+.prisma-out { position: relative; padding-left: 38px; }
+.prisma-out::before { content: ""; position: absolute; left: 0; top: 50%; width: 30px; border-top: 1.5px solid var(--muted); }
+.prisma-out::after { content: ""; position: absolute; left: 24px; top: calc(50% - 4px); border: 4px solid transparent; border-left: 7px solid var(--muted); }
+.prisma-down { padding: 4px 0 4px 24px; color: var(--muted); font-size: 1.1rem; line-height: 1; }
+@media (max-width: 980px) {
+  .compare-table { display: block; }
+  .compare-table thead { display: none; }
+  .compare-table tbody { display: grid; gap: 10px; }
+  .compare-table tr { display: grid; gap: 5px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+  .compare-table td { display: flex; justify-content: space-between; gap: 12px; padding: 0; border: 0; text-align: right; }
+  .compare-table td[data-label]::before { content: attr(data-label); color: var(--muted); font-size: 0.76rem; text-align: left; flex: none; max-width: 40%; }
+  .compare-table td:first-child { display: none; }
+  .compare-table td.cell-main { display: block; min-width: 0; text-align: left; font-weight: 600; overflow-wrap: anywhere; }
+  .table-wrap:has(.compare-table) { border: 0; overflow: visible; }
+}
+@media (max-width: 760px) {
+  .prisma-row { grid-template-columns: 1fr; gap: 8px; }
+  .prisma-out { padding: 0 0 0 24px; }
+  .prisma-out::before { left: 8px; top: -8px; width: 0; height: 8px; border-top: 0; border-left: 1.5px solid var(--muted); }
+  .prisma-out::after { display: none; }
+}

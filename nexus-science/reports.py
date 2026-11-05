@@ -18,12 +18,13 @@ from functools import lru_cache
 
 import citations
 import reliability
+import report_insights
 from brasil.nomes import normalizar
 from catalog import Work
 from db import Database, Transaction
 from discovery import citation_metadata
 from domain import LimitReachedError, NotFoundError
-from downloads import Block
+from downloads import Block, flow_block, table_block
 from extraction import Finding, extract_findings, split_sections
 from report_brasil import BrasilSection
 from timeutil import utcnow_iso as _now
@@ -559,11 +560,22 @@ def reliability_line(result: reliability.Reliability) -> str:
     return f"Confiabilidade: {result.score}/100 ({result.band}), cobertura de {result.coverage}% dos critérios."
 
 
-def report_blocks(report: Report, today: date | None = None, brasil: BrasilSection | None = None) -> list[Block]:
-    """Documento completo em blocos (vira HTML, DOCX, Markdown ou texto pelo gerador de downloads)."""
+def report_insights_for(report: Report) -> tuple[list[StudyAssessment], dict[str, object], dict[str, object], dict[str, object]]:
+    """Avaliacoes dos incluidos, resumo executivo, tabela comparativa e diagrama de selecao (tudo calculado por codigo)."""
+    assessments = [assess_study(item.work) for item in report.included]
+    return (assessments, report_insights.executive_summary(report, assessments), report_insights.comparison_table(report, assessments),
+            report_insights.selection_flow(report, assessments))
+
+
+def report_blocks(report: Report, today: date | None = None, brasil: BrasilSection | None = None, author: str = "") -> list[Block]:
+    """Documento completo em blocos (vira HTML, DOCX, Markdown, texto ou PDF pelo gerador de downloads)."""
     chosen = report.included
     works = [item.work for item in chosen]
+    assessments, executive, comparison, flow = report_insights_for(report)
     blocks: list[Block] = [("title", report.title), ("meta", f"Relatório de tema · versão {report.version} · {len(chosen)} estudos incluídos")]
+    if author:
+        blocks.append(("meta", f"Preparado por {author}"))
+    blocks += [("h1", "Resumo executivo"), *report_insights.summary_lines(executive)]
     if report.question:
         blocks += [("h1", "Pergunta ou tema"), *[("p", line) for line in report.question.splitlines() if line.strip()]]
 
@@ -576,11 +588,12 @@ def report_blocks(report: Report, today: date | None = None, brasil: BrasilSecti
         if pairs:
             blocks.append(("li", f"{label}: " + "; ".join(f"{name} ({n})" for name, n in pairs)))  # type: ignore[attr-defined]
 
+    if chosen:
+        blocks += [("h1", "Tabela comparativa dos estudos"), table_block(comparison["head"], comparison["rows"])]  # type: ignore[arg-type]
     blocks.append(("h1", "Estudos incluídos"))
     if not chosen:
         blocks.append(("p", "Nenhum estudo foi incluído."))
-    for number, item in enumerate(chosen, 1):
-        assessment = assess_study(item.work)
+    for number, (item, assessment) in enumerate(zip(chosen, assessments, strict=True), 1):
         blocks.append(("h2", f"{number}. {item.work.title}"))
         blocks += [("meta", line) for line in identity_lines(item.work)]
         blocks.append(("p", reliability_line(assessment.reliability)))
@@ -598,6 +611,7 @@ def report_blocks(report: Report, today: date | None = None, brasil: BrasilSecti
         blocks += [("li", citations.format_citation(citation_metadata(w), style)) for w in works] or [("p", "Sem estudos incluídos.")]
 
     blocks.append(("h1", "Apêndice: método"))
+    blocks += [("h2", str(flow["title"])), flow_block(flow), ("meta", str(flow["note"]))]
     blocks += [("p", paragraph) for paragraph in method_paragraphs(report, today) if paragraph]
     if brasil is not None:
         blocks.append(("p", brasil.method))

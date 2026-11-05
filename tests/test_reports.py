@@ -143,7 +143,8 @@ def test_report_blocks_has_every_section_in_order(store):
                           items=[("1", True, "Estudo central"), ("3", False, "Em inglês")])
     blocks = report_blocks(report, date(2026, 10, 18))
     headings = [text for kind, text in blocks if kind in ("title", "h1")]
-    assert headings == ["Exercício e pressão", "Pergunta ou tema", "Panorama dos estudos incluídos", "Estudos incluídos", "Referências", "Apêndice: método"]
+    assert headings == ["Exercício e pressão", "Resumo executivo", "Pergunta ou tema", "Panorama dos estudos incluídos", "Tabela comparativa dos estudos",
+                        "Estudos incluídos", "Referências", "Apêndice: método"]
     flat = "\n".join(text for _, text in blocks)
     assert "1. Estudo 1 sobre exercício" in flat and "2. Estudo 2 sobre exercício" in flat and "Estudo 3 sobre exercício" in flat  # o 3 so aparece como excluido
     assert "3. Estudo 3" not in flat and "Nota do autor: Estudo central" in flat
@@ -158,7 +159,7 @@ def test_report_blocks_has_every_section_in_order(store):
 def test_report_blocks_handles_no_included_studies(store):
     report = store.update(EMAIL, create(store).id, title="", question="", method_note="", items=[(r, False, "") for r in ("1", "2", "3")])
     flat = "\n".join(text for _, text in report_blocks(report))
-    assert "Nenhum estudo foi incluído." in flat and "Sem estudos incluídos." in flat
+    assert "Nenhum estudo foi incluído." in flat and "Sem estudos incluídos." in flat and "Tabela comparativa" not in flat
 
 
 # ------------------------------------------------------------------ rotas
@@ -230,10 +231,13 @@ def test_create_edit_and_read_a_report_through_the_api(env):
     first = created["items"][0]
     assert first["included"] and first["reliability"]["score"] is not None and first["findings"] and first["work"]["title"].startswith("Estudo 1")
     assert created["panorama"]["total"] == 2 and created["method"] and created["criteria"]
+    assert created["executive"]["numbers"][0]["value"] == "2 de 2" and len(created["comparison"]["rows"]) == 2
+    assert [s["n"] for s in created["flow"]["stages"]] == [2, 2, 2]
     saved = client.put(f"/api/reports/{created['id']}", json={
         "title": "Novo título", "question": "Funciona?", "methodNote": "Nota livre", "items": [{"ref": "1", "included": False, "note": "fora"}],
     }).json()
     assert saved["version"] == 2 and saved["methodNote"] == "Nota livre" and saved["panorama"]["total"] == 1
+    assert saved["executive"]["numbers"][0]["value"] == "1 de 2" and saved["flow"]["stages"][1]["out"]["n"] == 1
     assert [i["included"] for i in saved["items"]] == [False, True] and saved["items"][0]["note"] == "fora"
     assert client.get(f"/api/reports/{created['id']}").json()["title"] == "Novo título"
     [summary] = client.get("/api/reports").json()["reports"]
@@ -269,7 +273,9 @@ def test_download_html_docx_markdown_and_text(env):
         assert "Exercício e pressão" in archive.read("word/document.xml").decode("utf-8")
     assert "## Referências" in client.get(base, params={"format": "md"}).text
     assert "APÊNDICE: MÉTODO" in client.get(base, params={"format": "txt"}).text
-    assert client.get(base, params={"format": "pdf"}).status_code == 400
+    pdf = client.get(base, params={"format": "pdf"})
+    assert pdf.status_code == 200 and pdf.content.startswith(b"%PDF") and pdf.headers["content-disposition"].endswith('.pdf"')
+    assert client.get(base, params={"format": "rtf"}).status_code == 400
 
 
 def test_html_escapes_user_text(env):

@@ -22,6 +22,7 @@ from reports import (
     new_in_list,
     panorama,
     report_blocks,
+    report_insights_for,
 )
 from routes.context import ApiContext
 from routes.payloads import (
@@ -61,7 +62,9 @@ def register_reports_routes(app: FastAPI, ctx: ApiContext) -> None:
                                     "coverage": assessment.reliability.coverage, "warnings": list(assessment.reliability.warnings)},
                     "findings": [{"tags": list(f.tags), "sentence": f.sentence} for f in assessment.findings[:FINDINGS_PER_STUDY]],
                 })
+            _, executive, comparison, flow = report_insights_for(report)
             return {
+                "executive": executive, "comparison": comparison, "flow": flow,
                 "id": report.id, "title": report.title, "question": report.question, "methodNote": report.method_note,
                 "listName": report.list_name, "createdAt": report.created_at, "updatedAt": report.updated_at, "version": report.version,
                 "substances": list(report.substances), "items": items, "panorama": panorama(chosen), "method": [p for p in method_paragraphs(report) if p],
@@ -182,9 +185,11 @@ def register_reports_routes(app: FastAPI, ctx: ApiContext) -> None:
         ) -> Response:
             if format not in downloads.TEXT_FORMATS:
                 raise NexusError("Formato de download inválido.")
-            report = report_store.get(require_user(request), report_id)
+            user = require_user(request)
+            report = report_store.get(user, report_id)
             section = report_brasil.build(report.substances, brasil_bases(request)) if report.substances else None
-            content, media = downloads.render(report_blocks(report, brasil=section), format)
+            author = ctx.profiles.name(user) if ctx.profiles is not None else ""
+            content, media = downloads.render(report_blocks(report, brasil=section, author=author), format, brand="Relatório de tema")
             filename = downloads.analysis_filename(report.title, "relatorio", downloads.TEXT_FORMATS[format][2])
             return Response(content, media_type=media, headers={
                 "Content-Disposition": f'attachment; filename="{filename}"', "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",

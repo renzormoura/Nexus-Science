@@ -3235,6 +3235,28 @@
  },
  "GET /api/reports/{report_id}": {
   "json": {
+   "comparison": {
+    "head": [
+     "#",
+     "Estudo",
+     "Tipo de estudo",
+     "Periódico",
+     "Confiabilidade",
+     "Acesso aberto",
+     "Principal dado do resumo"
+    ],
+    "rows": [
+     [
+      "1",
+      "Weber et al. (2024). Estudo de contrato 1",
+      "Não informado",
+      "Example Journal",
+      "100/100 (Alta)",
+      "Não",
+      "Results: Lower risk (RR 0.89; 95% CI 0.81-0.98; p=0.02)."
+     ]
+    ]
+   },
    "createdAt": "<ts>",
    "criteria": [
     {
@@ -3278,6 +3300,79 @@
      "weight": 5
     }
    ],
+   "executive": {
+    "alerts": [
+     "1 estudo com nota calculada com menos de 80% dos critérios verificáveis."
+    ],
+    "note": "Este resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recomenda conduta.",
+    "numbers": [
+     {
+      "label": "Estudos incluídos",
+      "value": "1 de 1"
+     },
+     {
+      "label": "Com acesso aberto",
+      "value": "0"
+     },
+     {
+      "label": "Período publicado",
+      "value": "2024"
+     },
+     {
+      "label": "Nota mediana",
+      "value": "—"
+     }
+    ],
+    "question": "Metformina?",
+    "reliability": [
+     {
+      "band": "Alta",
+      "count": 1
+     }
+    ],
+    "top": [],
+    "types": [
+     [
+      "Tipo de estudo não informado",
+      1
+     ]
+    ]
+   },
+   "flow": {
+    "note": "Diagrama adaptado do PRISMA 2020: ele mostra apenas o que o relatório registra. A busca que originou a lista de leitura não é guardada; por isso não há contagem de registros duplicados ou removidos antes da lista.",
+    "stages": [
+     {
+      "label": "Estudos reunidos pelo autor",
+      "n": 1,
+      "notes": [
+       "Europe PMC: 1"
+      ],
+      "out": null,
+      "stage": "Identificação"
+     },
+     {
+      "label": "Estudos avaliados pelo autor",
+      "n": 1,
+      "notes": [],
+      "out": {
+       "label": "Excluídos pelo autor",
+       "n": 0,
+       "notes": []
+      },
+      "stage": "Triagem"
+     },
+     {
+      "label": "Estudos incluídos no relatório",
+      "n": 1,
+      "notes": [
+       "1 com nota de confiabilidade calculada"
+      ],
+      "out": null,
+      "stage": "Inclusão"
+     }
+    ],
+    "title": "Diagrama de seleção dos estudos (adaptado do PRISMA 2020)"
+   },
    "id": "<id>",
    "items": [
     {
@@ -3440,19 +3535,19 @@
  "GET /api/reports/{report_id}/download [html]": {
   "disposition": "attachment; filename=\"relatorio-relatorio.html\"",
   "status": 200,
-  "text": "<!doctype html>\n<html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Relatório</title><style>body{font:16px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#111}h1{font-size:1.7rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}h3{font-size:1.05rem}h4{font-size:1rem}.meta{color:#555;font-size:.9rem;margin:.2rem 0}blockquote{border-left:3px solid #ea580c;margin:1rem 0;padding:.1rem 1rem;color:#222}li{margin:.3rem 0}</style></head><body>\n<h1>Relatório</h",
+  "text": "<!doctype html>\n<html lang=\"pt-BR\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><title>Relatório</title><style>body{font:16px/1.6 system-ui,-apple-system,'Segoe UI',Roboto,Arial,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem;color:#111}h1{font-size:1.7rem;line-height:1.25}h2{font-size:1.25rem;margin-top:2rem}h3{font-size:1.05rem}h4{font-size:1rem}.meta{color:#555;font-size:.9rem;margin:.2rem 0}blockquote{border-left:3px solid #ea580c;margin:1rem 0;padding:.1rem 1rem;color:#222}li{margin:.3rem 0}.brand{display:flex;align-items:center",
   "type": "text/html"
  },
  "GET /api/reports/{report_id}/download [md]": {
   "disposition": "attachment; filename=\"relatorio-relatorio.md\"",
   "status": 200,
-  "text": "# Relatório\n\nRelatório de tema · versão 3 · 1 estudos incluídos  \n\n## Pergunta ou tema\n\nMetformina?\n\n## Panorama dos estudos incluídos\n\n1 estudos; 0 com acesso aberto; 0 retratados; 0 sem resumo no registro.\n\n- Tipo de estudo: Tipo de estudo não informado (1)\n- Ano: 2024 (1)\n- Idioma: Idioma não informado (1)\n- Fonte: Europe PMC (1)\n\n## Estudos incluídos\n\n### 1. Estudo de contrato 1\n\nAnika Weber, Hiro Suzuki  \nExample Journal, v. 27, n. 5, p. 890-903 · 2024  \nDOI: https://doi.org/10.0000/1 · PMID: 1  \nFonte: Europe PMC  \n\nConfiabilidade: 100/100 (Alta), cobertura de 70% dos critérios.\n\nNota ca",
+  "text": "# Relatório\n\nRelatório de tema · versão 3 · 1 estudos incluídos  \nPreparado por Ana S.  \n\n## Resumo executivo\n\nEstudos incluídos: 1 de 1 · Com acesso aberto: 0 · Período publicado: 2024 · Nota mediana: —\n\n- Confiabilidade dos incluídos: Alta (1)\n- Tipos de estudo mais frequentes: Tipo de estudo não informado (1)\n\n#### Pontos de atenção\n\n- 1 estudo com nota calculada com menos de 80% dos critérios verificáveis.\nEste resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recomenda conduta.",
   "type": "text/markdown"
  },
  "GET /api/reports/{report_id}/download [txt]": {
   "disposition": "attachment; filename=\"relatorio-relatorio.txt\"",
   "status": 200,
-  "text": "RELATÓRIO\n=========\n\nRelatório de tema · versão 3 · 1 estudos incluídos\n\nPERGUNTA OU TEMA\n----------------\nMetformina?\n\n\nPANORAMA DOS ESTUDOS INCLUÍDOS\n------------------------------\n1 estudos; 0 com acesso aberto; 0 retratados; 0 sem resumo no registro.\n\n- Tipo de estudo: Tipo de estudo não informado (1)\n- Ano: 2024 (1)\n- Idioma: Idioma não informado (1)\n- Fonte: Europe PMC (1)\n\nESTUDOS INCLUÍDOS\n-----------------\n\n1. Estudo de contrato 1\n\nAnika Weber, Hiro Suzuki\nExample Journal, v. 27, n. 5, p. 890-903 · 2024\nDOI: https://doi.org/10.0000/1 · PMID: 1\nFonte: Europe PMC\nConfiabilidade: 100/100",
+  "text": "RELATÓRIO\n=========\n\nRelatório de tema · versão 3 · 1 estudos incluídos\nPreparado por Ana S.\n\nRESUMO EXECUTIVO\n----------------\nEstudos incluídos: 1 de 1 · Com acesso aberto: 0 · Período publicado: 2024 · Nota mediana: —\n\n- Confiabilidade dos incluídos: Alta (1)\n- Tipos de estudo mais frequentes: Tipo de estudo não informado (1)\n\nPontos de atenção\n\n- 1 estudo com nota calculada com menos de 80% dos critérios verificáveis.\nEste resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recome",
   "type": "text/plain"
  },
  "GET /api/reports/{report_id}/history": {
@@ -3969,6 +4064,28 @@
  },
  "POST /api/reports": {
   "json": {
+   "comparison": {
+    "head": [
+     "#",
+     "Estudo",
+     "Tipo de estudo",
+     "Periódico",
+     "Confiabilidade",
+     "Acesso aberto",
+     "Principal dado do resumo"
+    ],
+    "rows": [
+     [
+      "1",
+      "Weber et al. (2024). Estudo de contrato 1",
+      "Não informado",
+      "Example Journal",
+      "100/100 (Alta)",
+      "Não",
+      "Results: Lower risk (RR 0.89; 95% CI 0.81-0.98; p=0.02)."
+     ]
+    ]
+   },
    "createdAt": "<ts>",
    "criteria": [
     {
@@ -4012,6 +4129,79 @@
      "weight": 5
     }
    ],
+   "executive": {
+    "alerts": [
+     "1 estudo com nota calculada com menos de 80% dos critérios verificáveis."
+    ],
+    "note": "Este resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recomenda conduta.",
+    "numbers": [
+     {
+      "label": "Estudos incluídos",
+      "value": "1 de 1"
+     },
+     {
+      "label": "Com acesso aberto",
+      "value": "0"
+     },
+     {
+      "label": "Período publicado",
+      "value": "2024"
+     },
+     {
+      "label": "Nota mediana",
+      "value": "—"
+     }
+    ],
+    "question": "Metformina?",
+    "reliability": [
+     {
+      "band": "Alta",
+      "count": 1
+     }
+    ],
+    "top": [],
+    "types": [
+     [
+      "Tipo de estudo não informado",
+      1
+     ]
+    ]
+   },
+   "flow": {
+    "note": "Diagrama adaptado do PRISMA 2020: ele mostra apenas o que o relatório registra. A busca que originou a lista de leitura não é guardada; por isso não há contagem de registros duplicados ou removidos antes da lista.",
+    "stages": [
+     {
+      "label": "Estudos reunidos pelo autor",
+      "n": 1,
+      "notes": [
+       "Europe PMC: 1"
+      ],
+      "out": null,
+      "stage": "Identificação"
+     },
+     {
+      "label": "Estudos avaliados pelo autor",
+      "n": 1,
+      "notes": [],
+      "out": {
+       "label": "Excluídos pelo autor",
+       "n": 0,
+       "notes": []
+      },
+      "stage": "Triagem"
+     },
+     {
+      "label": "Estudos incluídos no relatório",
+      "n": 1,
+      "notes": [
+       "1 com nota de confiabilidade calculada"
+      ],
+      "out": null,
+      "stage": "Inclusão"
+     }
+    ],
+    "title": "Diagrama de seleção dos estudos (adaptado do PRISMA 2020)"
+   },
    "id": "<id>",
    "items": [
     {
@@ -4123,6 +4313,28 @@
   "json": {
    "added": 0,
    "report": {
+    "comparison": {
+     "head": [
+      "#",
+      "Estudo",
+      "Tipo de estudo",
+      "Periódico",
+      "Confiabilidade",
+      "Acesso aberto",
+      "Principal dado do resumo"
+     ],
+     "rows": [
+      [
+       "1",
+       "Weber et al. (2024). Estudo de contrato 1",
+       "Não informado",
+       "Example Journal",
+       "100/100 (Alta)",
+       "Não",
+       "Results: Lower risk (RR 0.89; 95% CI 0.81-0.98; p=0.02)."
+      ]
+     ]
+    },
     "createdAt": "<ts>",
     "criteria": [
      {
@@ -4166,6 +4378,80 @@
       "weight": 5
      }
     ],
+    "executive": {
+     "alerts": [
+      "1 estudo com nota calculada com menos de 80% dos critérios verificáveis."
+     ],
+     "note": "Este resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recomenda conduta.",
+     "numbers": [
+      {
+       "label": "Estudos incluídos",
+       "value": "1 de 1"
+      },
+      {
+       "label": "Com acesso aberto",
+       "value": "0"
+      },
+      {
+       "label": "Período publicado",
+       "value": "2024"
+      },
+      {
+       "label": "Nota mediana",
+       "value": "—"
+      }
+     ],
+     "question": "Metformina?",
+     "reliability": [
+      {
+       "band": "Alta",
+       "count": 1
+      }
+     ],
+     "top": [],
+     "types": [
+      [
+       "Tipo de estudo não informado",
+       1
+      ]
+     ]
+    },
+    "flow": {
+     "note": "Diagrama adaptado do PRISMA 2020: ele mostra apenas o que o relatório registra. A busca que originou a lista de leitura não é guardada; por isso não há contagem de registros duplicados ou removidos antes da lista.",
+     "stages": [
+      {
+       "label": "Estudos reunidos pelo autor",
+       "n": 1,
+       "notes": [
+        "Europe PMC: 1",
+        "1 busca registrada depois da criação"
+       ],
+       "out": null,
+       "stage": "Identificação"
+      },
+      {
+       "label": "Estudos avaliados pelo autor",
+       "n": 1,
+       "notes": [],
+       "out": {
+        "label": "Excluídos pelo autor",
+        "n": 0,
+        "notes": []
+       },
+       "stage": "Triagem"
+      },
+      {
+       "label": "Estudos incluídos no relatório",
+       "n": 1,
+       "notes": [
+        "1 com nota de confiabilidade calculada"
+       ],
+       "out": null,
+       "stage": "Inclusão"
+      }
+     ],
+     "title": "Diagrama de seleção dos estudos (adaptado do PRISMA 2020)"
+    },
     "id": "<id>",
     "items": [
      {
@@ -4278,6 +4564,28 @@
  },
  "POST /api/reports/{report_id}/restore": {
   "json": {
+   "comparison": {
+    "head": [
+     "#",
+     "Estudo",
+     "Tipo de estudo",
+     "Periódico",
+     "Confiabilidade",
+     "Acesso aberto",
+     "Principal dado do resumo"
+    ],
+    "rows": [
+     [
+      "1",
+      "Weber et al. (2024). Estudo de contrato 1",
+      "Não informado",
+      "Example Journal",
+      "100/100 (Alta)",
+      "Não",
+      "Results: Lower risk (RR 0.89; 95% CI 0.81-0.98; p=0.02)."
+     ]
+    ]
+   },
    "createdAt": "<ts>",
    "criteria": [
     {
@@ -4321,6 +4629,80 @@
      "weight": 5
     }
    ],
+   "executive": {
+    "alerts": [
+     "1 estudo com nota calculada com menos de 80% dos critérios verificáveis."
+    ],
+    "note": "Este resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recomenda conduta.",
+    "numbers": [
+     {
+      "label": "Estudos incluídos",
+      "value": "1 de 1"
+     },
+     {
+      "label": "Com acesso aberto",
+      "value": "0"
+     },
+     {
+      "label": "Período publicado",
+      "value": "2024"
+     },
+     {
+      "label": "Nota mediana",
+      "value": "—"
+     }
+    ],
+    "question": "Metformina?",
+    "reliability": [
+     {
+      "band": "Alta",
+      "count": 1
+     }
+    ],
+    "top": [],
+    "types": [
+     [
+      "Tipo de estudo não informado",
+      1
+     ]
+    ]
+   },
+   "flow": {
+    "note": "Diagrama adaptado do PRISMA 2020: ele mostra apenas o que o relatório registra. A busca que originou a lista de leitura não é guardada; por isso não há contagem de registros duplicados ou removidos antes da lista.",
+    "stages": [
+     {
+      "label": "Estudos reunidos pelo autor",
+      "n": 1,
+      "notes": [
+       "Europe PMC: 1",
+       "1 busca registrada depois da criação"
+      ],
+      "out": null,
+      "stage": "Identificação"
+     },
+     {
+      "label": "Estudos avaliados pelo autor",
+      "n": 1,
+      "notes": [],
+      "out": {
+       "label": "Excluídos pelo autor",
+       "n": 0,
+       "notes": []
+      },
+      "stage": "Triagem"
+     },
+     {
+      "label": "Estudos incluídos no relatório",
+      "n": 1,
+      "notes": [
+       "1 com nota de confiabilidade calculada"
+      ],
+      "out": null,
+      "stage": "Inclusão"
+     }
+    ],
+    "title": "Diagrama de seleção dos estudos (adaptado do PRISMA 2020)"
+   },
    "id": "<id>",
    "items": [
     {
@@ -4590,6 +4972,28 @@
  },
  "PUT /api/reports/{report_id}": {
   "json": {
+   "comparison": {
+    "head": [
+     "#",
+     "Estudo",
+     "Tipo de estudo",
+     "Periódico",
+     "Confiabilidade",
+     "Acesso aberto",
+     "Principal dado do resumo"
+    ],
+    "rows": [
+     [
+      "1",
+      "Weber et al. (2024). Estudo de contrato 1",
+      "Não informado",
+      "Example Journal",
+      "100/100 (Alta)",
+      "Não",
+      "Results: Lower risk (RR 0.89; 95% CI 0.81-0.98; p=0.02)."
+     ]
+    ]
+   },
    "createdAt": "<ts>",
    "criteria": [
     {
@@ -4633,6 +5037,79 @@
      "weight": 5
     }
    ],
+   "executive": {
+    "alerts": [
+     "1 estudo com nota calculada com menos de 80% dos critérios verificáveis."
+    ],
+    "note": "Este resumo é montado automaticamente a partir dos registros dos estudos e das suas escolhas: são contagens e dados do registro, sem interpretação. Ele não conclui nem recomenda conduta.",
+    "numbers": [
+     {
+      "label": "Estudos incluídos",
+      "value": "1 de 1"
+     },
+     {
+      "label": "Com acesso aberto",
+      "value": "0"
+     },
+     {
+      "label": "Período publicado",
+      "value": "2024"
+     },
+     {
+      "label": "Nota mediana",
+      "value": "—"
+     }
+    ],
+    "question": "Metformina?",
+    "reliability": [
+     {
+      "band": "Alta",
+      "count": 1
+     }
+    ],
+    "top": [],
+    "types": [
+     [
+      "Tipo de estudo não informado",
+      1
+     ]
+    ]
+   },
+   "flow": {
+    "note": "Diagrama adaptado do PRISMA 2020: ele mostra apenas o que o relatório registra. A busca que originou a lista de leitura não é guardada; por isso não há contagem de registros duplicados ou removidos antes da lista.",
+    "stages": [
+     {
+      "label": "Estudos reunidos pelo autor",
+      "n": 1,
+      "notes": [
+       "Europe PMC: 1"
+      ],
+      "out": null,
+      "stage": "Identificação"
+     },
+     {
+      "label": "Estudos avaliados pelo autor",
+      "n": 1,
+      "notes": [],
+      "out": {
+       "label": "Excluídos pelo autor",
+       "n": 0,
+       "notes": []
+      },
+      "stage": "Triagem"
+     },
+     {
+      "label": "Estudos incluídos no relatório",
+      "n": 1,
+      "notes": [
+       "1 com nota de confiabilidade calculada"
+      ],
+      "out": null,
+      "stage": "Inclusão"
+     }
+    ],
+    "title": "Diagrama de seleção dos estudos (adaptado do PRISMA 2020)"
+   },
    "id": "<id>",
    "items": [
     {

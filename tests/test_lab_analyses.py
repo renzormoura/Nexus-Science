@@ -60,6 +60,8 @@ def test_analysis_document_has_title_article_and_ai_warning_in_every_format():
         content, _ = downloads.render(blocks, fmt)
         if fmt == "docx":
             assert content[:2] == b"PK" and zipfile.ZipFile(io.BytesIO(content)).testzip() is None
+        elif fmt == "pdf":
+            assert content.startswith(b"%PDF")
         else:
             text = content.decode("utf-8")
             assert "resumo clínico" in text.lower() and "confira sempre com o artigo original" in text
@@ -165,11 +167,11 @@ def test_save_list_view_download_and_delete_analysis_flow(client):
     assert client.get("/api/analyses", params={"ref": "2"}).json()["analyses"] == []
     full = client.get(f"/api/analyses/{analysis_id}").json()
     assert full["markdown"] == MARKDOWN.strip() and "<h" in full["html"] and "<script" not in full["html"].lower()
-    for fmt in ("docx", "md", "html", "txt"):
+    for fmt in ("docx", "md", "html", "txt", "pdf"):
         response = client.get(f"/api/analyses/{analysis_id}/download", params={"format": fmt})
         assert response.status_code == 200 and response.headers["content-disposition"].startswith('attachment; filename="resumo-clinico')
         assert response.headers["x-content-type-options"] == "nosniff"
-    assert client.get(f"/api/analyses/{analysis_id}/download", params={"format": "pdf"}).status_code == 400
+    assert client.get(f"/api/analyses/{analysis_id}/download", params={"format": "rtf"}).status_code == 400
     assert client.delete(f"/api/analyses/{analysis_id}").status_code == 200
     assert client.get(f"/api/analyses/{analysis_id}").status_code == 404 and client.delete(f"/api/analyses/{analysis_id}").status_code == 404
 
@@ -190,7 +192,7 @@ def test_stateless_export_needs_no_account_and_escapes_html(client):
     response = client.post("/api/export/analysis", json=body)
     assert response.status_code == 200 and "<script>" not in response.text and "<img" not in response.text
     assert "&lt;img" in response.text and response.headers["content-disposition"].startswith("attachment")
-    assert client.post("/api/export/analysis", json={**body, "format": "pdf"}).status_code == 400
+    assert client.post("/api/export/analysis", json={**body, "format": "rtf"}).status_code == 400
     assert client.post("/api/export/analysis", json={**body, "markdown": ""}).status_code == 422
     docx = client.post("/api/export/analysis", json={**body, "format": "docx"})
     assert docx.content[:2] == b"PK"

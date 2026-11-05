@@ -446,7 +446,7 @@
         h("span", { class: "muted" }, ` · ${item.page || "laboratório"} · ${Number.isNaN(date.getTime()) ? "" : date.toLocaleDateString("pt-BR")}`)),
       showTitle ? h("a", { href: Lib.buildHash("/artigo", { ref: item.ref }), class: "analysis-article" }, item.title) : null,
       h("div", { class: "row" }, toggle,
-        ["docx", "md", "html", "txt"].map((f) => h("a", { class: "btn btn-sm btn-secondary", href: `/api/analyses/${encodeURIComponent(item.id)}/download?format=${f}`, download: "" }, f.toUpperCase())),
+        ["pdf", "docx", "md", "html", "txt"].map((f) => h("a", { class: "btn btn-sm btn-secondary", href: `/api/analyses/${encodeURIComponent(item.id)}/download?format=${f}`, download: "" }, f.toUpperCase())),
         remove),
       body);
   }
@@ -2266,7 +2266,7 @@
   }
 
   // ------------------------------------------------------------------ Relatório de tema
-  const REPORT_DOWNLOADS = [["Página web (.html)", "html"], ["Word (.docx)", "docx"], ["Markdown (.md)", "md"]];
+  const REPORT_DOWNLOADS = [["PDF (.pdf)", "pdf"], ["Word (.docx)", "docx"], ["Página web (.html)", "html"], ["Markdown (.md)", "md"]];
 
   async function createReportFromList(list) {
     const created = await guarded(() => api("/api/reports", { method: "POST", body: { list_id: list.id } }));
@@ -2475,6 +2475,39 @@
     return { node: box };
   }
 
+  // ---- partes novas do relatorio: resumo executivo, tabela comparativa e diagrama de selecao (tudo vem calculado do servidor)
+  function executiveView(summary) {
+    const pairs = (items) => items.map(([name, count]) => `${name} (${count})`).join("; ");
+    return h("div", { class: "exec stack" },
+      h("div", { class: "exec-nums" }, summary.numbers.map((n) => h("div", { class: "exec-num" }, h("strong", {}, n.value), h("span", {}, n.label)))),
+      summary.reliability.length ? h("p", {}, h("strong", {}, "Confiabilidade dos incluídos: "), summary.reliability.map((r) => `${r.band} (${r.count})`).join("; ")) : null,
+      summary.types.length ? h("p", {}, h("strong", {}, "Tipos de estudo mais frequentes: "), pairs(summary.types)) : null,
+      summary.top.length ? [h("h3", {}, "Estudos com maior nota de confiabilidade"),
+        h("ol", { class: "plain-list" }, summary.top.map((t) => h("li", {}, `${t.title} (${t.year || "s.d."}) · ${t.score}/100 (${t.band})`)))] : null,
+      summary.alerts.length ? [h("h3", {}, "Pontos de atenção"), h("ul", { class: "plain-list exec-alerts" }, summary.alerts.map((a) => h("li", {}, a)))] : null,
+      h("p", { class: "hint" }, summary.note));
+  }
+
+  function comparisonView(table) {
+    if (!table.rows.length) return h("p", { class: "muted" }, "Nenhum estudo incluído.");
+    return h("div", { class: "table-wrap" }, h("table", { class: "compare-table" },
+      h("thead", {}, h("tr", {}, table.head.map((label) => h("th", { scope: "col" }, label)))),
+      h("tbody", {}, table.rows.map((row) => h("tr", {}, row.map((cell, i) => h("td", { "data-label": i <= 1 ? null : table.head[i], class: i === 1 ? "cell-main" : "" }, cell)))))));
+  }
+
+  function flowView(flow) {
+    const last = flow.stages.length - 1;
+    const notes = (list) => list.map((text) => h("span", { class: "prisma-note" }, text));
+    return h("figure", { class: "prisma", "aria-label": flow.title },
+      h("figcaption", {}, flow.title),
+      flow.stages.map((stage, i) => h("div", { class: "prisma-stage" },
+        h("div", { class: "prisma-row" },
+          h("div", { class: `prisma-box${i === last ? " is-final" : ""}` }, h("small", {}, stage.stage), h("strong", {}, stage.label), h("b", {}, `n = ${stage.n}`), notes(stage.notes)),
+          stage.out ? h("div", { class: "prisma-out" }, h("div", { class: "prisma-box" }, h("strong", {}, stage.out.label), h("b", {}, `n = ${stage.out.n}`), notes(stage.out.notes))) : null),
+        i < last ? h("div", { class: "prisma-down", "aria-hidden": "true" }, "↓") : null)),
+      h("p", { class: "hint" }, flow.note));
+  }
+
   async function renderReport(reportId) {
     setTitle("Relatório");
     if (!session.user) {
@@ -2516,6 +2549,9 @@
         h("ul", { class: "plain-list" }, lines));
     };
     paintPanorama(data.panorama);
+    const executiveBox = h("div"), comparisonBox = h("div"), flowBox = h("div");
+    const paintInsights = (info) => { mount(executiveBox, executiveView(info.executive)); mount(comparisonBox, comparisonView(info.comparison)); mount(flowBox, flowView(info.flow)); };
+    paintInsights(data);
     const status = h("span", { class: "note", "aria-live": "polite" }, `Versão ${data.version}`);
     const saveButton = h("button", { type: "button", class: "btn btn-primary" }, "Salvar alterações");
 
@@ -2532,6 +2568,7 @@
       status.textContent = `Salvo · versão ${saved.version}`;
       titleInput.value = saved.title;
       paintPanorama(saved.panorama);
+      paintInsights(saved);
       setTitle(saved.title);
       if (brasil) brasil.reload();
       return saved;
@@ -2550,13 +2587,16 @@
       h("section", { class: "card stack" },
         h("div", { class: "field" }, h("label", { for: "report-title" }, "Título"), titleInput),
         h("div", { class: "field" }, h("label", { for: "report-question" }, "Pergunta ou tema"), questionInput)),
+      h("h2", {}, "Resumo executivo"), executiveBox,
       h("h2", {}, "Estudos"),
       h("p", { class: "hint" }, "Desmarque o que não deve entrar. A nota de confiabilidade e as frases estatísticas vêm do resumo do registro."),
       rows.map((r) => r.card),
       h("h2", {}, "Atualizar o relatório"), updates.node,
       h("h2", {}, "Panorama"), panoramaBox,
+      h("h2", {}, "Tabela comparativa"), comparisonBox,
       brasil ? [h("h2", {}, "Situação no Brasil (medicamentos)"), brasil.node] : null,
       h("h2", {}, "Método"),
+      flowBox,
       h("p", { class: "hint" }, "O texto abaixo é montado automaticamente e entra no apêndice do documento."),
       h("ul", { class: "plain-list" }, data.method.map((p) => h("li", {}, p))),
       h("details", { class: "more-records" }, h("summary", {}, "Como a nota de confiabilidade é calculada"),
@@ -2565,7 +2605,7 @@
       h("div", { class: "report-foot" }, status,
         h("div", { class: "row" }, saveButton,
           REPORT_DOWNLOADS.map(([label, format]) => h("button", { type: "button", class: "btn btn-secondary", onclick: download(format) }, label)))),
-      h("p", { class: "note" }, "Para PDF: baixe a página web (.html), abra no navegador e use Imprimir, Salvar como PDF. O relatório não conclui nem recomenda conduta; cabe ao autor interpretar os estudos."));
+      h("p", { class: "note" }, "O PDF e o Word saem com a marca, o resumo executivo, a tabela comparativa e o diagrama de seleção. O relatório não conclui nem recomenda conduta; cabe ao autor interpretar os estudos."));
   }
 
   // ------------------------------------------------------------------ Lista compartilhada

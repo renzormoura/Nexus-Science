@@ -2,6 +2,13 @@
 
 ## 2026-10 — Início animado: jornada para o convidado e painel em blocos
 
+### Adicionado (relatório de tema com cara de consultoria)
+- **Resumo executivo** de uma página: estudos incluídos, acesso aberto, período, nota mediana, distribuição da confiabilidade, tipos de estudo, os três de maior nota e pontos de atenção. Tudo calculado por código, sem IA e sem conclusões.
+- **Tabela comparativa** com uma linha por estudo (tipo, periódico, confiabilidade, acesso aberto e principal dado do resumo); no celular vira cartões.
+- **Diagrama de seleção** adaptado do PRISMA 2020 (identificação, triagem, inclusão) só com o que o relatório registra.
+- **Exportação em PDF** (novo) e Word com a marca Nexus Science no cabeçalho e rodapé; as análises do Laboratório de IA também saem em PDF. Nova dependência: `reportlab`. Letras de outros alfabetos (grego, cirílico, CJK) viram `?` no PDF.
+- Teste do pool de conexões deixou de depender do tempo ligado do computador.
+
 ### Desempenho (abrir o site e entrar na conta)
 - **Banco PostgreSQL:** as conexões passam a ser reaproveitadas (até 4 livres, testadas quando ficam paradas e trocadas se o Neon as derrubou). Antes cada consulta abria uma conexão nova com TLS, e um login ou uma abertura de página fazia várias.
 - **Compressão (gzip):** `browse.js` caiu de 211 KB para 57 KB.

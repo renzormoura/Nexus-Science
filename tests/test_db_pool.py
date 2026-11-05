@@ -79,7 +79,8 @@ def test_stale_dead_connection_is_replaced(pg, monkeypatch):
     database, created = pg
     database.execute("SELECT 1")
     created[0].broken_when_idle = True  # o servidor derrubou a conexao enquanto ela estava parada
-    monkeypatch.setattr(db.time, "monotonic", lambda: 10_000.0)
+    later = db.time.monotonic() + 10_000.0  # relogio real + muito tempo: independe de quanto o computador esta ligado
+    monkeypatch.setattr(db.time, "monotonic", lambda: later)
     database.execute("SELECT 1")
     assert len(created) == 2 and created[0].closed and created[1].commits == 1
 
