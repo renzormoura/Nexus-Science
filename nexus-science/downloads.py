@@ -9,6 +9,7 @@ usuario ao link aberto que a fonte informa.
 
 from __future__ import annotations
 
+import base64
 import io
 import json
 import re
@@ -17,6 +18,7 @@ import zipfile
 from dataclasses import dataclass
 from datetime import date
 from html import escape
+from pathlib import Path
 from xml.etree.ElementTree import Element
 from xml.sax.saxutils import escape as xml_escape
 
@@ -296,17 +298,28 @@ _HTML_STYLE = (
     "h3{font-size:1.05rem}h4{font-size:1rem}.meta{color:#555;font-size:.9rem;margin:.2rem 0}"
     "blockquote{border-left:3px solid #ea580c;margin:1rem 0;padding:.1rem 1rem;color:#222}li{margin:.3rem 0}"
     ".brand{display:flex;align-items:center;gap:.6rem;border-bottom:2px solid #ea580c;padding-bottom:.6rem;margin-bottom:1.5rem;"
-    "font-weight:700}.brand i{display:grid;place-items:center;width:1.6rem;height:1.6rem;border-radius:.4rem;background:#ea580c;"
-    "color:#fff;font-style:normal}.brand span{margin-left:auto;font-weight:400;color:#555;font-size:.85rem}"
+    "font-weight:700}.brand img{width:1.8rem;height:1.8rem}.brand span{margin-left:auto;font-weight:400;color:#555;font-size:.85rem}"
     "table{border-collapse:collapse;width:100%;font-size:.8rem;margin:1rem 0}th{background:#ea580c;color:#fff;text-align:left}"
     "th,td{border:1px solid #ccc;padding:.35rem .5rem;vertical-align:top}tr:nth-child(even) td{background:#faf5f0}"
     ".flow{margin:1rem 0;text-align:center}@media print{body{max-width:none;margin:0}h2{break-after:avoid}tr{break-inside:avoid}}"
 )
 
 
+ICON_PATH = Path(__file__).parent / "static" / "icone.png"
+
+
+def _icon_bytes() -> bytes:
+    return ICON_PATH.read_bytes()
+
+
+def _icon_data_uri() -> str:
+    """O icone do projeto embutido no HTML baixado, que precisa funcionar sozinho (sem o site)."""
+    return "data:image/png;base64," + base64.b64encode(_icon_bytes()).decode("ascii")
+
+
 def to_html(blocks: list[Block], brand: str = "") -> str:
     title = next((t for k, t in blocks if k == "title"), "Artigo")
-    body: list[str] = [f'<div class="brand"><i>N</i>Nexus Science<span>{escape(brand)}</span></div>'] if brand else []
+    body: list[str] = [f'<div class="brand"><img src="{_icon_data_uri()}" alt="">Nexus Science<span>{escape(brand)}</span></div>'] if brand else []
     in_list = False
     for kind, text in blocks:
         if kind != "li" and in_list:
@@ -366,6 +379,8 @@ def _docx_paragraph(kind: str, text: str) -> str:
 
 
 _DOCX_NS = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"'
+_DOCX_PIC_NS = ('xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" '
+                'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"')
 _DOCX_TEXT_WIDTH = 9072  # A4 menos as margens, em vinte avos de ponto
 _DOCX_COLUMN_SHARE = {7: (4, 26, 14, 14, 15, 8, 19)}  # a tabela comparativa do relatorio: # / estudo / tipo / periodico / nota / aberto / dado
 
@@ -426,9 +441,17 @@ def _docx_flow(text: str) -> str:
 
 def _docx_header_footer(brand: str) -> tuple[str, str]:
     accent = '<w:b/><w:color w:val="EA580C"/><w:sz w:val="22"/>'
+    picture = (
+        '<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="72000"><wp:extent cx="252000" cy="252000"/>'
+        '<wp:docPr id="1" name="Nexus Science" descr="Nexus Science"/><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture">'
+        '<pic:pic><pic:nvPicPr><pic:cNvPr id="1" name="icone.png"/><pic:cNvPicPr/></pic:nvPicPr>'
+        '<pic:blipFill><a:blip r:embed="rId1"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill>'
+        '<pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="252000" cy="252000"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr>'
+        '</pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r>'
+    )
     rule = '<w:pBdr><w:bottom w:val="single" w:sz="8" w:space="4" w:color="EA580C"/></w:pBdr>'
     muted = '<w:color w:val="555555"/><w:sz w:val="18"/>'
-    header = (f'<w:hdr {_DOCX_NS}><w:p><w:pPr>{rule}</w:pPr>{_docx_run("Nexus Science", accent)}'
+    header = (f'<w:hdr {_DOCX_NS} {_DOCX_PIC_NS}><w:p><w:pPr>{rule}</w:pPr>{picture}{_docx_run("Nexus Science", accent)}'
               f'{_docx_run("   " + brand, muted)}</w:p></w:hdr>')
     gray = '<w:color w:val="777777"/><w:sz w:val="16"/>'
     footer = (f'<w:ftr {_DOCX_NS}><w:p><w:pPr><w:jc w:val="center"/></w:pPr>{_docx_run("Gerado pelo Nexus Science · página ", gray)}'
@@ -461,6 +484,7 @@ def to_docx(blocks: list[Block], brand: str = "") -> bytes:
         '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'
         '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'
         '<Default Extension="xml" ContentType="application/xml"/>'
+        '<Default Extension="png" ContentType="image/png"/>'
         '<Override PartName="/word/document.xml" '
         f'ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>{extra_types}</Types>'
     )
@@ -477,6 +501,12 @@ def to_docx(blocks: list[Block], brand: str = "") -> bytes:
         '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>'
         "</Relationships>"
     )
+    header_rels = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/icone.png"/>'
+        "</Relationships>"
+    )
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr("[Content_Types].xml", content_types)
@@ -485,6 +515,8 @@ def to_docx(blocks: list[Block], brand: str = "") -> bytes:
         if brand:
             header, footer = _docx_header_footer(brand)
             archive.writestr("word/_rels/document.xml.rels", doc_rels)
+            archive.writestr("word/_rels/header1.xml.rels", header_rels)
+            archive.writestr("word/media/icone.png", _icon_bytes())
             archive.writestr("word/header1.xml", f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>{header}')
             archive.writestr("word/footer1.xml", f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>{footer}')
     return buffer.getvalue()

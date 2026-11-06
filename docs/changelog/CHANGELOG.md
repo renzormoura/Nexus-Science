@@ -2,6 +2,9 @@
 
 ## 2026-10 — Início animado: jornada para o convidado e painel em blocos
 
+### Alterado (nova logo e ícone)
+- A logo (NEXUS SCIENCE com a lupa) e o ícone da lupa passam a ser a identidade do projeto: topo e rodapé do site (versão clara e escura, trocada conforme o tema), favicon, ícone para celular (`apple-touch-icon`, 192 e 512 px) e cabeçalho do PDF, do Word e do HTML dos relatórios. O antigo `favicon.svg` foi removido.
+
 ### Adicionado (relatório de tema com cara de consultoria)
 - **Resumo executivo** de uma página: estudos incluídos, acesso aberto, período, nota mediana, distribuição da confiabilidade, tipos de estudo, os três de maior nota e pontos de atenção. Tudo calculado por código, sem IA e sem conclusões.
 - **Tabela comparativa** com uma linha por estudo (tipo, periódico, confiabilidade, acesso aberto e principal dado do resumo); no celular vira cartões.

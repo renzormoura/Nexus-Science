@@ -134,7 +134,8 @@ def test_docx_with_brand_has_valid_header_footer_tables_and_flow(report):
     with zipfile.ZipFile(io.BytesIO(data)) as archive:
         names = set(archive.namelist())
         assert {"word/header1.xml", "word/footer1.xml", "word/_rels/document.xml.rels"} <= names
-        for name in names:
+        assert "word/media/icone.png" in names and archive.read("word/media/icone.png").startswith(bytes([137]) + b"PNG")
+        for name in names - {"word/media/icone.png"}:
             fromstring(archive.read(name))  # todo XML bem formado
         document = archive.read("word/document.xml").decode("utf-8")
         assert document.count("<w:tbl>") >= 4 and "headerReference" in document and "n = 6" in document

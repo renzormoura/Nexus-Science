@@ -72,7 +72,7 @@
  },
  "GET /": {
   "status": 200,
-  "text": "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"color-scheme\" content=\"dark light\">\n  <meta name=\"description\" content=\"Encontre, entenda e organize artigos científicos: busca com filtros, versão aberta, citações e listas de leitura.\">\n  <title>Nexus Science — navegador de artigos</title>\n  <link rel=\"icon\" href=\"/static/favicon.svg\" type=\"image/svg+xml\">\n  <link rel=\"stylesheet\" href=\"/static/browse.css?v=<hash>\">\n  <link rel=\"stylesheet\" href=\"/static/brand.css?v=<hash>\">\n  <script src=\"/",
+  "text": "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"color-scheme\" content=\"dark light\">\n  <meta name=\"description\" content=\"Encontre, entenda e organize artigos científicos: busca com filtros, versão aberta, citações e listas de leitura.\">\n  <title>Nexus Science — navegador de artigos</title>\n  <link rel=\"icon\" href=\"/static/favicon.ico\" sizes=\"48x48\">\n  <link rel=\"icon\" href=\"/static/favicon-32.png\" type=\"image/png\" sizes=\"32x32\">\n  <link rel=\"apple-touch-icon\" href=\"/static/apple-touch-icon.p",
   "type": "text/html"
  },
  "GET /api/account": {
@@ -3649,7 +3649,7 @@
  },
  "GET /ia": {
   "status": 200,
-  "text": "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"color-scheme\" content=\"dark light\">\n  <meta name=\"description\" content=\"Análise de artigos científicos com IA, fiel ao texto-fonte, para estudantes e profissionais.\">\n  <title>Laboratório de IA — Nexus Science</title>\n  <link rel=\"icon\" href=\"/static/favicon.svg\" type=\"image/svg+xml\">\n  <link rel=\"stylesheet\" href=\"/static/app.css?v=<hash>\">\n  <link rel=\"stylesheet\" href=\"/static/brand.css?v=<hash>\">\n  <script src=\"/static/app.js?v=<hash>\" def",
+  "text": "<!doctype html>\n<html lang=\"pt-BR\">\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <meta name=\"color-scheme\" content=\"dark light\">\n  <meta name=\"description\" content=\"Análise de artigos científicos com IA, fiel ao texto-fonte, para estudantes e profissionais.\">\n  <title>Laboratório de IA — Nexus Science</title>\n  <link rel=\"icon\" href=\"/static/favicon.ico\" sizes=\"48x48\">\n  <link rel=\"icon\" href=\"/static/favicon-32.png\" type=\"image/png\" sizes=\"32x32\">\n  <link rel=\"apple-touch-icon\" href=\"/static/apple-touch-icon.png\">\n  <link rel=\"styles",
   "type": "text/html"
  },
  "POST /api/account/password": {

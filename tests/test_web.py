@@ -89,7 +89,7 @@ def test_index_has_no_inline_script_or_style_and_no_external_resources(env):
 
 
 def test_static_assets_are_served_with_cache_header(env):
-    for path, kind in (("/static/app.css", "text/css"), ("/static/app.js", "javascript"), ("/static/favicon.svg", "svg")):
+    for path, kind in (("/static/app.css", "text/css"), ("/static/app.js", "javascript"), ("/static/favicon-32.png", "png")):
         response = env.client.get(path)
         assert response.status_code == 200 and kind in response.headers["content-type"]
         assert "max-age" in response.headers["cache-control"]

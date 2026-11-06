@@ -37,6 +37,15 @@ svg.is-filled { fill: currentColor; }
 .topbar { height: 56px; padding: 0 24px; gap: 28px; align-items: stretch; background: color-mix(in srgb, var(--bg) 92%, transparent); border-bottom: 1px solid var(--border); }
 .topbar .brand { align-self: center; gap: 10px; }
 .brand-mark { width: 26px; height: 26px; color: var(--accent); }
+.brand-logo { display: block; height: 34px; width: auto; }
+.brand-logo.logo-light { display: none; }
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) .brand-logo.logo-dark { display: none; }
+  :root:not([data-theme="dark"]) .brand-logo.logo-light { display: block; }
+}
+:root[data-theme="light"] .brand-logo.logo-dark { display: none; }
+:root[data-theme="light"] .brand-logo.logo-light { display: block; }
+.site-footer .brand-logo { height: 38px; }
 .brand-name { font-size: 1rem; font-weight: 400; letter-spacing: -0.01em; color: var(--muted); }
 .brand-name b, .brand-name .accent { font-weight: 700; color: var(--text); }
 .mainnav { display: flex; align-items: stretch; gap: 2px; flex: 1; overflow-x: auto; }

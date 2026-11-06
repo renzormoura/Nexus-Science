@@ -17,6 +17,7 @@ from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
+from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import (
     BaseDocTemplate,
@@ -30,6 +31,7 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+import downloads
 import flowchart
 
 ACCENT = colors.HexColor("#ea580c")
@@ -189,14 +191,10 @@ def to_pdf(blocks: list[tuple[str, str]], brand: str = "") -> bytes:
     def decorate(canvas: Canvas, doc: BaseDocTemplate) -> None:
         width, height = A4
         canvas.saveState()
-        canvas.setFillColor(ACCENT)
-        canvas.roundRect(MARGIN, height - 1.45 * cm, 0.5 * cm, 0.5 * cm, 1.2, stroke=0, fill=1)
-        canvas.setFillColor(colors.white)
-        canvas.setFont("Helvetica-Bold", 8)
-        canvas.drawCentredString(MARGIN + 0.25 * cm, height - 1.3 * cm, "N")
+        canvas.drawImage(ImageReader(io.BytesIO(downloads._icon_bytes())), MARGIN, height - 1.5 * cm, 0.6 * cm, 0.6 * cm, mask="auto")
         canvas.setFillColor(colors.black)
         canvas.setFont("Helvetica-Bold", 10)
-        canvas.drawString(MARGIN + 0.7 * cm, height - 1.3 * cm, "Nexus Science")
+        canvas.drawString(MARGIN + 0.8 * cm, height - 1.3 * cm, "Nexus Science")
         canvas.setFillColor(GRAY)
         canvas.setFont("Helvetica", 8.5)
         if brand:
